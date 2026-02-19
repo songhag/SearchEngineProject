@@ -5,10 +5,10 @@ from typing import Dict
 def extract_zoned_text(html: str) -> Dict[str, str]:
     """
     Extract text from potentially broken HTML into zones:
-      - title: <title>
-      - headers: <h1><h2><h3>
-      - bold: <b><strong>
-      - body: visible text from the whole page
+        title: <title>
+        headers: <h1><h2><h3>
+        bold: <b><strong>
+        body: keep visible text
     if parsing fails, fall back to plain text.
     """
     if not html:
