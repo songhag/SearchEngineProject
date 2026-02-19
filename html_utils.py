@@ -8,7 +8,7 @@ def extract_zoned_text(html: str) -> Dict[str, str]:
       - title: <title>
       - headers: <h1><h2><h3>
       - bold: <b><strong>
-      - body: visible-ish text from the whole page
+      - body: visible text from the whole page
     if parsing fails, fall back to plain text.
     """
     if not html:
