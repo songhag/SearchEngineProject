@@ -31,7 +31,7 @@ def iter_partial(path: str) -> Iterator[Tuple[str, List[Posting]]]:
 
 def merge_postings(a: List[Posting], b: List[Posting]) -> List[Posting]:
     """
-    Merge two postings lists (each contains unique doc_id, not necessarily sorted).
+    Merge two postings lists
     If same doc_id appears, sum the fields.
     """
     by = {}
@@ -50,7 +50,6 @@ def merge_postings(a: List[Posting], b: List[Posting]) -> List[Posting]:
             )
         else:
             by[doc_id] = p
-    # return sorted by doc_id (nice for later)
     return [by[k] for k in sorted(by.keys())]
 
 
