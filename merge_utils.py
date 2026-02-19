@@ -97,7 +97,6 @@ def merge_partials(partial_paths: List[str], out_path: str) -> int:
                 current_term = term
                 current_postings = postings
 
-            # advance iterator i
             try:
                 nxt_term, nxt_postings = next(iters[i])
                 heapq.heappush(heap, (nxt_term, i, nxt_postings))
