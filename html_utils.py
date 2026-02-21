@@ -4,7 +4,7 @@ from typing import Dict
 
 def extract_zoned_text(html: str) -> Dict[str, str]:
     """
-    Extract text from potentially broken HTML into zones:
+    Extract text from potentially broken HTML:
         title: <title>
         headers: <h1><h2><h3>
         bold: <b><strong>

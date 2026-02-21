@@ -10,7 +10,7 @@ def dump_partial_index(path: str, index: Dict[str, List[Posting]]) -> None:
     """
     Write a partial index as JSONL:
       {"term":"...", "postings":[[doc_id, tf, title_tf, header_tf, bold_tf], ...]}
-    Terms are written in sorted order.
+    Written in sorted order.
     """
     with open(path, "w", encoding="utf-8") as f:
         for term in sorted(index.keys()):

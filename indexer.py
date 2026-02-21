@@ -15,7 +15,7 @@ def build_partial_index_for_doc(
     tokenizer: Tokenizer,
 ) -> Dict[str, Posting]:
     """
-    Build per-doc term stats.
+    Build term stats for a single doc.
     Returns: term -> posting tuple for THIS doc only:
       (doc_id, tf, title_tf, header_tf, bold_tf)
     """
@@ -29,8 +29,7 @@ def build_partial_index_for_doc(
     c_bold = Counter(bold_tokens)
     c_body = Counter(body_tokens)
 
-    # total tf we define as body + title + header + bold (simple, consistent)
-    # You can change later for scoring; M1 only requires tf.
+    # total tf = body + title + header + bold
     terms = set(c_title) | set(c_header) | set(c_bold) | set(c_body)
     per_doc = {}
     for t in terms:
@@ -61,7 +60,7 @@ def main():
 
     # doc_id -> url
     doc_map: List[str] = []
-    # SPIMI in-memory partial
+    # SPIMI in-memory partial index
     partial_index: Dict[str, List[Posting]] = defaultdict(list)
 
     doc_count = 0
@@ -75,7 +74,7 @@ def main():
         dump_partial_index(partial_path, partial_index)
         partial_count += 1
         partial_index = defaultdict(list)
-
+    # loop through all doc
     for _, url, content in iter_json_docs(args.corpus):
         doc_id = doc_count
         doc_map.append(url)
@@ -108,7 +107,7 @@ def main():
     docmap_path = os.path.join(args.out, "doc_id_to_url.json")
     write_json(docmap_path, {"doc_count": doc_count, "doc_id_to_url": doc_map})
 
-    # compute size (KB)
+    # compute size
     index_kb = file_size_kb(final_index_path)
 
     stats = {
@@ -123,7 +122,7 @@ def main():
     }
     write_json(os.path.join(args.out, "m1_stats.json"), stats)
 
-    print("=== Milestone 1 Analytics ===")
+    print("=== Analytics ===")
     print(f"Indexed documents: {doc_count}")
     print(f"Unique tokens:     {unique_terms}")
     print(f"Index size (KB):   {index_kb:.2f}")
