@@ -43,7 +43,7 @@ def build_partial_index_for_doc(
 
 
 def main():
-    ap = argparse.ArgumentParser(description="CS121 Search Engine - Milestone 1 Indexer (Developer-friendly)")
+    ap = argparse.ArgumentParser(description="CS121 Search Engine - Milestone 1 Indexer")
     ap.add_argument("--corpus", required=True, help="Path to extracted dataset root (e.g., ./developer/ or ./analyst/)")
     ap.add_argument("--out", default="./out_m1", help="Output directory for index files")
     ap.add_argument("--use-stem", action="store_true", default=True, help="Enable Porter stemming (default on)")
