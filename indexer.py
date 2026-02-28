@@ -60,6 +60,7 @@ def main():
 
     # doc_id -> url
     doc_map: List[str] = []
+    seen_urls = set()
     # SPIMI in-memory partial index
     partial_index: Dict[str, List[Posting]] = defaultdict(list)
 
@@ -76,6 +77,11 @@ def main():
         partial_index = defaultdict(list)
     # loop through all doc
     for _, url, content in iter_json_docs(args.corpus):
+
+        if url in seen_urls:
+            continue
+        seen_urls.add(url)
+
         doc_id = doc_count
         doc_map.append(url)
 

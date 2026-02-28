@@ -100,7 +100,6 @@ def score_doc_tf_idf(
 
         tf = float(p.tf)
         if use_importance_boost:
-            # simple boosts; you can tune later for M3
             tf += 2.0 * p.title_tf + 1.5 * p.header_tf + 1.2 * p.bold_tf
 
         # log-tf helps stability

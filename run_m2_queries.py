@@ -16,7 +16,7 @@ QUERIES = [
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Run required Milestone 2 queries and print top 5 URLs each")
+    ap = argparse.ArgumentParser(description="Run required Milestone 2 queries and print top 5 URLs")
     ap.add_argument("--index", required=True, help="Path to index_final.jsonl")
     ap.add_argument("--lexicon", required=True, help="Path to lexicon.tsv")
     ap.add_argument("--docmap", required=True, help="Path to doc_id_to_url.json")
