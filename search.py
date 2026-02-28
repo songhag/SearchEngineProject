@@ -92,7 +92,7 @@ def score_doc_tf_idf(
     Score a doc for a multi-term query:
     sum over terms: (weighted_tf) * idf
     idf = log((N+1)/(df+1)) + 1
-    weighted_tf includes (optional) boosts for title/header/bold
+    weighted_tf includes boosts for title/header/bold
     """
     score = 0.0
     for p, df in zip(doc_postings, dfs):
@@ -143,11 +143,8 @@ def search_and(
     if not rank:
         return [(doc_id, 0.0) for doc_id in list(doc_to_postings.keys())[:topk]]
 
-    # Need postings aligned with dfs (same term order as query)
-    # intersect_docsets currently preserves postings in the sorted-by-df order,
-    # so we must reorder dfs consistently:
-    # easiest: rebuild in the same sorted order
-    # We sort pairs (df, postings) together earlier in intersect step; do it here:
+    # reorder dfs to match sorted postings_lists
+    # rebuild dfs in same df-sorted ordre
     pairs = list(zip(dfs, postings_lists))
     pairs.sort(key=lambda x: len(x[1]))
     dfs_sorted = [x[0] for x in pairs]
