@@ -2,35 +2,37 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
 
 from tokenizer import Tokenizer
-from search import load_docmap, load_lexicon, search_and
+from search import load_docmap, load_lexicon, search_ranked
 
 
 QUERIES = [
-    # good queries
+
+    # Queries that performed well
     "cristina lopes",
     "machine learning",
     "ACM",
-    "master of software engineering",
     "computer science",
-    "data science",
-    "information retrieval",
     "software engineering",
     "ics faculty",
     "graduate admissions",
+    "faculty directory computer science",
+    "undergraduate academic advising",
+    "graduate admission requirements",
 
-    # likely poor queries
+    # Queries that initially performed poorly
+    "master of software engineering",
     "who is cristina lopes",
     "where is the ics department",
     "contact computer science department",
-    "graduate admission requirements",
-    "undergraduate academic advising",
-    "faculty directory computer science",
     "phd program application",
     "machine learning faculty uc irvine",
     "software engineering prerequisites",
-    "office hours admissions"
+    "office hours admissions",
+    "ics department location",
+    "apply for phd in computer science"
 ]
 
 
@@ -50,15 +52,23 @@ def main():
     all_results = {}
 
     for q in QUERIES:
-        results = search_and(
-            query=q,
-            index_path=args.index,
-            lexicon=lexicon,
-            tokenizer=tokenizer,
-            N=N,
-            topk=10,
-            rank=True
+        start = time.time()
+
+        results = search_ranked(
+            query = q,
+            index_path = args.index,
+            lexicon = lexicon,
+            tokenizer = tokenizer,
+            N = N,
+            topk = 10
         )
+
+        end = time.time()
+        elapsed = end - start
+
+        print("\n==============================")
+        print(f"Query: {q}")
+        print(f"Time: {elapsed:.4f} seconds")
 
         top_urls = [urls[doc_id] for doc_id, _ in results]
         all_results[q] = top_urls

@@ -3,8 +3,9 @@ from __future__ import annotations
 import argparse
 import json
 import math
+from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple
 
 from tokenizer import Tokenizer
 
@@ -40,20 +41,19 @@ def load_lexicon(lexicon_path: str) -> Dict[str, Tuple[int, int]]:
     return lex
 
 
-def read_postings_at(index_path: str, offset: int) -> Tuple[str, int, List[Posting]]:
+def read_postings_at_handle(f, offset: int) -> Tuple[str, int, List[Posting]]:
     """
-    Seek to offset, read one JSON line, parse postings.
-    Returns (term, df, postings_list)
+    Seek to offset in an already-open index file handle,
+    read one JSON line, and parse postings.
     """
-    with open(index_path, "rb") as f:
-        f.seek(offset)
-        line = f.readline()
+    f.seek(offset)
+    line = f.readline()
     obj = json.loads(line.decode("utf-8"))
+
     term = obj["term"]
     df = int(obj.get("df", 0))
     postings = []
     for p in obj["postings"]:
-        # p = [doc_id, tf, title_tf, header_tf, bold_tf]
         postings.append(Posting(int(p[0]), int(p[1]), int(p[2]), int(p[3]), int(p[4])))
     return term, df, postings
 
@@ -81,6 +81,34 @@ def intersect_docsets(postings_lists: List[List[Posting]]) -> Dict[int, List[Pos
             break
     return base
 
+
+def score_single_term_posting(
+    p: Posting,
+    df: int,
+    N: int,
+    use_importance_boost: bool = True
+) -> float:
+    """
+    TF-IDF contribution of one query term in one document.
+    """
+    idf = math.log((N + 1.0) / (df + 1.0)) + 1.0
+
+    tf = float(p.tf)
+    if use_importance_boost:
+        tf += 2.0 * p.title_tf + 1.5 * p.header_tf + 1.2 * p.bold_tf
+
+    tfw = 1.0 + math.log(tf) if tf > 0 else 0.0
+    return tfw * idf
+
+
+def normalize_query_terms(query: str, tokenizer: Tokenizer) -> List[str]:
+    """
+    Tokenize + deduplicate while preserving order.
+    """
+    terms = tokenizer.tokenize(query)
+    if not terms:
+        return []
+    return list(dict.fromkeys(terms))
 
 def score_doc_tf_idf(
     doc_postings: List[Posting],
@@ -121,20 +149,21 @@ def search_and(
     Returns list of (doc_id, score) sorted by score desc if rank=True,
     else score is 0 and order is arbitrary.
     """
-    terms = tokenizer.tokenize(query)
+    terms = normalize_query_terms(query, tokenizer)
     if not terms:
         return []
 
     postings_lists: List[List[Posting]] = []
     dfs: List[int] = []
 
-    for t in terms:
-        if t not in lexicon:
-            return []  # AND-only: any missing term => empty
-        offset, df = lexicon[t]
-        _, _, postings = read_postings_at(index_path, offset)
-        postings_lists.append(postings)
-        dfs.append(df)
+    with open(index_path, "rb") as f:
+        for t in terms:
+            if t not in lexicon:
+                return []
+            offset, df = lexicon[t]
+            _, _, postings = read_postings_at_handle(f, offset)
+            postings_lists.append(postings)
+            dfs.append(df)
 
     doc_to_postings = intersect_docsets(postings_lists)
     if not doc_to_postings:
@@ -158,27 +187,93 @@ def search_and(
     return scored[:topk]
 
 
+def search_ranked(
+    query: str,
+    index_path: str,
+    lexicon: Dict[str, Tuple[int, int]],
+    tokenizer: Tokenizer,
+    N: int,
+    topk: int = 10
+) -> List[Tuple[int, float]]:
+    """
+    Milestone 3 ranked retrieval:
+    - union of postings lists (soft matching, not strict AND)
+    - TF-IDF scoring
+    - title/header/bold boosts
+    - query coverage bonus
+    """
+    terms = normalize_query_terms(query, tokenizer)
+    if not terms:
+        return []
+
+    valid_term_count = 0
+    doc_scores: Dict[int, float] = defaultdict(float)
+    doc_match_count: Dict[int, int] = defaultdict(int)
+
+    with open(index_path, "rb") as f:
+        for t in terms:
+            if t not in lexicon:
+                continue
+
+            offset, df = lexicon[t]
+            _, _, postings = read_postings_at_handle(f, offset)
+            valid_term_count += 1
+
+            for p in postings:
+                doc_scores[p.doc_id] += score_single_term_posting(
+                    p, df, N, use_importance_boost=True
+                )
+                doc_match_count[p.doc_id] += 1
+
+    if valid_term_count == 0:
+        return []
+
+    scored = []
+    for doc_id, base_score in doc_scores.items():
+        matched_terms = doc_match_count[doc_id]
+        coverage = matched_terms / valid_term_count
+
+        final_score = base_score * (0.7 + 0.3 * coverage)
+
+        if matched_terms == valid_term_count:
+            final_score += 1.0
+
+        scored.append((doc_id, final_score))
+
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return scored[:topk]
+
 def interactive_loop(args):
     tokenizer = Tokenizer(use_stem=not args.no_stem)
     N, urls = load_docmap(args.docmap)
     lexicon = load_lexicon(args.lexicon)
 
-    print("=== Search Interface (AND-only) ===")
+    print("=== Search Interface ===")
     print("Type a query (space-separated terms). Empty line to quit.")
-    print(f"Ranking: {'TF-IDF' if args.rank else 'OFF'} | Stem: {not args.no_stem}")
+    print(f"Mode: {args.mode} | Stem: {not args.no_stem}")
     while True:
         q = input("\nquery> ").strip()
         if not q:
             break
-        results = search_and(
-            query=q,
-            index_path=args.index,
-            lexicon=lexicon,
-            tokenizer=tokenizer,
-            N=N,
-            topk=args.topk,
-            rank=args.rank
-        )
+        if args.mode == "and":
+            results = search_and(
+                query = q,
+                index_path = args.index,
+                lexicon = lexicon,
+                tokenizer = tokenizer,
+                N = N,
+                topk = args.topk,
+                rank = args.rank
+            )
+        else:
+            results = search_ranked(
+                query = q,
+                index_path = args.index,
+                lexicon = lexicon,
+                tokenizer = tokenizer,
+                N = N,
+                topk = args.topk
+            )
         if not results:
             print("(no results)")
             continue
@@ -197,6 +292,12 @@ def main():
     ap.add_argument("--no-stem", action="store_true", help="Disable stemming (default stems)")
     ap.add_argument("--interactive", action="store_true", help="Run interactive console UI (for screenshot)")
     ap.add_argument("--query", type=str, default=None, help="Run a single query and print results")
+    ap.add_argument(
+        "--mode",
+        choices = ["and", "ranked"],
+        default = "ranked",
+        help = "Search mode: strict Boolean AND or ranked retrieval (default: ranked)"
+    )
     args = ap.parse_args()
 
     if args.interactive or args.query is None:
@@ -207,15 +308,25 @@ def main():
     N, urls = load_docmap(args.docmap)
     lexicon = load_lexicon(args.lexicon)
 
-    results = search_and(
-        query=args.query,
-        index_path=args.index,
-        lexicon=lexicon,
-        tokenizer=tokenizer,
-        N=N,
-        topk=args.topk,
-        rank=args.rank
-    )
+    if args.mode == "and":
+        results = search_and(
+            query = args.query,
+            index_path = args.index,
+            lexicon = lexicon,
+            tokenizer = tokenizer,
+            N = N,
+            topk = args.topk,
+            rank = args.rank
+        )
+    else:
+        results = search_ranked(
+            query = args.query,
+            index_path = args.index,
+            lexicon = lexicon,
+            tokenizer = tokenizer,
+            N = N,
+            topk = args.topk
+        )
     for i, (doc_id, score) in enumerate(results, start=1):
         print(f"{i:02d}. {urls[doc_id]}\t{score:.6f}")
 
