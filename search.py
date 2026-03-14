@@ -153,6 +153,7 @@ def search_and(
     if not terms:
         return []
 
+
     postings_lists: List[List[Posting]] = []
     dfs: List[int] = []
 
@@ -206,10 +207,13 @@ def search_ranked(
     if not terms:
         return []
 
+    query_bigrams = list(zip(terms, terms[1:]))
+
     valid_term_count = 0
     doc_scores: Dict[int, float] = defaultdict(float)
     doc_match_count: Dict[int, int] = defaultdict(int)
     doc_title_match_count: Dict[int, int] = defaultdict(int)
+    term_to_docs: Dict[str, set] = {}
 
     with open(index_path, "rb") as f:
         for t in terms:
@@ -219,6 +223,7 @@ def search_ranked(
             offset, df = lexicon[t]
             _, _, postings = read_postings_at_handle(f, offset)
             valid_term_count += 1
+            term_to_docs[t] = {p.doc_id for p in postings}
 
             for p in postings:
                 doc_scores[p.doc_id] += score_single_term_posting(
@@ -240,6 +245,15 @@ def search_ranked(
 
         final_score = base_score * (0.7 + 0.3 * coverage)
         final_score += 0.8 * title_matches
+
+        phrase_bonus = 0.0
+        for t1, t2 in query_bigrams:
+            docs1 = term_to_docs.get(t1, set())
+            docs2 = term_to_docs.get(t2, set())
+            if doc_id in docs1 and doc_id in docs2:
+                phrase_bonus += 0.5
+
+        final_score += phrase_bonus
 
         if matched_terms == valid_term_count:
             final_score += 1.0

@@ -13,15 +13,15 @@
   ],
   "machine learning": [
     "https://www.ics.uci.edu/~welling/publications/publications.html",
-    "http://mondego.ics.uci.edu/datasets/maven-contents.txt",
     "https://cml.ics.uci.edu/category/aiml/page/2/",
     "https://cml.ics.uci.edu/category/aiml/",
+    "http://mondego.ics.uci.edu/datasets/maven-contents.txt",
     "https://www.ics.uci.edu/~pazzani/Publications/OldPublications.html",
     "https://www.ics.uci.edu/~pazzani/Publications/APubs.html",
+    "https://cml.ics.uci.edu/category/aiml/page/3/",
     "https://www.ics.uci.edu/community/news/view_news.php?id=5",
     "https://www.ics.uci.edu/~rickl/courses/cs-171/2016-fq-cs171/CS-171-FQ-2016_draft.htm",
-    "https://www.ics.uci.edu/~rickl/courses/cs-171/2016-fq-cs171/CS-171-FQ-2016_20160918.htm",
-    "https://www.ics.uci.edu/~rickl/courses/cs-171/2016-fq-cs171/CS-171-FQ-2016_20160919.htm"
+    "https://www.ics.uci.edu/~rickl/courses/cs-171/2016-fq-cs171/CS-171-FQ-2016_20160918.htm"
   ],
   "ics department": [
     "https://www.ics.uci.edu/faculty/index.php",
@@ -37,15 +37,15 @@
   ],
   "computer science": [
     "https://www.ics.uci.edu/~eppstein/bibs/eppstein.html",
-    "https://www.ics.uci.edu/~dan/class/267P/datasets/calgary/bib",
     "https://www.ics.uci.edu/faculty/index.php",
     "https://www.ics.uci.edu/faculty/",
     "https://www.ics.uci.edu/community/news/notes/notes_2007.php",
-    "https://www.ics.uci.edu/~eppstein/bibs/kpath.bib",
-    "https://cml.ics.uci.edu/category/aiml/page/2/",
+    "https://www.ics.uci.edu/~dan/class/267P/datasets/calgary/bib",
     "https://www.ics.uci.edu/faculty/faculty_dept?department=Computer%20Science",
     "https://www.ics.uci.edu/faculty/index.php?department=Computer%20Science",
-    "https://www.ics.uci.edu/faculty/?department=Computer%20Science"
+    "https://www.ics.uci.edu/faculty/?department=Computer%20Science",
+    "https://www.ics.uci.edu/~eppstein/bibs/kpath.bib",
+    "https://www.ics.uci.edu/community/news/notes/notes_2014.php"
   ],
   "software engineering": [
     "http://mondego.ics.uci.edu/datasets/maven-contents.txt",
@@ -57,7 +57,7 @@
     "https://redmiles.ics.uci.edu/publication/",
     "https://www.ics.uci.edu/~wscacchi/",
     "https://www.ics.uci.edu/~wscacchi/publications.html",
-    "https://www.ics.uci.edu/~emilyo/SimSE/publications.html"
+    "https://www.ics.uci.edu/~wscacchi/Papers/Vintage/Software_Productivity.html"
   ],
   "ics faculty": [
     "https://www.ics.uci.edu/~rickl/courses/ics-h197/2013-fq-h197/ICS-H197-FQ-2013.htm",
@@ -93,7 +93,7 @@
     "https://www.ics.uci.edu/faculty/",
     "https://www.ics.uci.edu/faculty/index.php?department=Computer%20Science",
     "https://www.ics.uci.edu/faculty/?department=Computer%20Science",
-    "http://mondego.ics.uci.edu/datasets/maven-contents.txt"
+    "https://www.ics.uci.edu/community/news/notes/notes_2013.php"
   ],
   "undergraduate academic advising": [
     "https://www.cs.uci.edu/undergraduate-programs/",
@@ -128,8 +128,8 @@
     "https://www.informatics.uci.edu/grad/ms-software-engineering/",
     "https://www.informatics.uci.edu/grad/courses/",
     "https://www.informatics.uci.edu/very-top-footer-menu-items/people/",
-    "https://www.informatics.uci.edu/undergrad/courses/",
-    "https://www.informatics.uci.edu/explore/books-we-have-written/"
+    "https://mswe.ics.uci.edu/program/curriculum/",
+    "https://www.informatics.uci.edu/undergrad/courses/"
   ],
   "who is cristina lopes": [
     "https://www.ics.uci.edu/community/news/notes/notes_2010.php",
@@ -145,8 +145,8 @@
   ],
   "where is the ics department": [
     "https://www.ics.uci.edu/~dan/class/267P/datasets/calgary/news",
-    "https://cml.ics.uci.edu/category/aiml/page/2/",
     "https://cml.ics.uci.edu/category/aiml/",
+    "https://cml.ics.uci.edu/category/aiml/page/2/",
     "https://www.ics.uci.edu/~ejw/authoring/protocol/rfc2518.xml",
     "https://www.ics.uci.edu/~dan/class/267P/datasets/calgary/book1",
     "https://grape.ics.uci.edu/wiki/public/raw-attachment/wiki/cs221-2019-spring-project2/Team2StressTest.txt",
@@ -188,8 +188,8 @@
     "https://cml.ics.uci.edu/category/news/page/2/?page=events&subPage=dss_schedule",
     "https://cml.ics.uci.edu/category/news/page/2/?page=events&subPage=aiml",
     "https://cml.ics.uci.edu/category/aiml/",
-    "https://cml.ics.uci.edu/category/news/",
-    "https://cml.ics.uci.edu/category/news/?page=events&subPage=dss_schedule"
+    "https://cml.ics.uci.edu/2016/10/midcareer-faculty-positions-at-uc-irvine/",
+    "https://cml.ics.uci.edu/category/news/"
   ],
   "software engineering prerequisites": [
     "https://www.ics.uci.edu/~icgse2016/4_01tutorial.html",
