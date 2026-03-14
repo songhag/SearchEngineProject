@@ -95,10 +95,10 @@ def score_single_term_posting(
 
     tf = float(p.tf)
     if use_importance_boost:
-        tf += 2.0 * p.title_tf + 1.5 * p.header_tf + 1.2 * p.bold_tf
+        tf += 5.0 * p.title_tf + 3.0 * p.header_tf + 1.5 * p.bold_tf
 
     tfw = 1.0 + math.log(tf) if tf > 0 else 0.0
-    return tfw * idf
+    return tfw * (idf ** 2)
 
 
 def normalize_query_terms(query: str, tokenizer: Tokenizer) -> List[str]:
@@ -128,11 +128,11 @@ def score_doc_tf_idf(
 
         tf = float(p.tf)
         if use_importance_boost:
-            tf += 2.0 * p.title_tf + 1.5 * p.header_tf + 1.2 * p.bold_tf
+            tf += 5.0 * p.title_tf + 3.0 * p.header_tf + 1.5 * p.bold_tf
 
         # log-tf helps stability
         tfw = 1.0 + math.log(tf) if tf > 0 else 0.0
-        score += tfw * idf
+        score += tfw * (idf ** 2)
     return score
 
 
@@ -209,6 +209,7 @@ def search_ranked(
     valid_term_count = 0
     doc_scores: Dict[int, float] = defaultdict(float)
     doc_match_count: Dict[int, int] = defaultdict(int)
+    doc_title_match_count: Dict[int, int] = defaultdict(int)
 
     with open(index_path, "rb") as f:
         for t in terms:
@@ -225,6 +226,9 @@ def search_ranked(
                 )
                 doc_match_count[p.doc_id] += 1
 
+                if p.title_tf > 0:
+                    doc_title_match_count[p.doc_id] += 1
+
     if valid_term_count == 0:
         return []
 
@@ -232,8 +236,10 @@ def search_ranked(
     for doc_id, base_score in doc_scores.items():
         matched_terms = doc_match_count[doc_id]
         coverage = matched_terms / valid_term_count
+        title_matches = doc_title_match_count[doc_id]
 
         final_score = base_score * (0.7 + 0.3 * coverage)
+        final_score += 0.8 * title_matches
 
         if matched_terms == valid_term_count:
             final_score += 1.0

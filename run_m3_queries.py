@@ -13,7 +13,7 @@ QUERIES = [
     # Queries that performed well
     "cristina lopes",
     "machine learning",
-    "ACM",
+    "ics department",
     "computer science",
     "software engineering",
     "ics faculty",
@@ -72,9 +72,6 @@ def main():
 
         top_urls = [urls[doc_id] for doc_id, _ in results]
         all_results[q] = top_urls
-
-        print("\n==============================")
-        print(f"Query: {q}")
 
         if not top_urls:
             print("(no results)")
